@@ -1,31 +1,17 @@
 <script setup lang="ts">
-import MainButton from '@/components/Base/MainButton.vue';
+import { onMounted } from 'vue';
+import DesignsList from '@/components/DesignsList.vue';
+import { useDesigns } from '@/composables/useDesigns';
+
+const { getDesigns, designs } = useDesigns();
+
+onMounted(async () => {
+  await getDesigns();
+});
 </script>
 
 <template>
-  <div class="container home-view">
-    <header class="home-header">
-      <h1 class="home-header__title">Всі дизайни</h1>
-      <MainButton text="Додати дизайн" />
-    </header>
-    <main></main>
-  </div>
+  <DesignsList :designs="designs" />
 </template>
 
-<style lang="scss" scoped>
-.home-view {
-  background-color: $bg-green-color;
-  width: 100%;
-}
-.home-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-}
-.home-header__title {
-  font-size: 24px;
-  line-height: 1.67;
-  color: $white-color;
-}
-</style>
+<style lang="scss" scoped></style>

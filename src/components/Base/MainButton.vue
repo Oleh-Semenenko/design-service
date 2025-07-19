@@ -18,6 +18,7 @@ withDefaults(
 <template>
   <button
     class="main-button"
+    :class="`main-button--${type}`"
     @click="btnCallback"
     type="button"
     :disabled="disabled"
@@ -37,13 +38,9 @@ withDefaults(
   font-size: 14px;
   line-height: 1.43;
 
-  // &:disabled {
-  //   background-color: $color-gray-light;
-  //   cursor: not-allowed;
-  // }
-
-  // &:hover:not(:disabled) {
-  //   background-color: darken($color-primary, 10%);
-  // }
+  &--secondary {
+    background-color: $white-color;
+    color: $error-color;
+  }
 }
 </style>
