@@ -8,7 +8,19 @@ const router = createRouter({
     {
       path: '/',
       component: BaseLayout,
-      children: [{ path: '', name: 'home', component: HomeView }]
+      children: [
+        { path: '', name: 'home', component: HomeView },
+        {
+          path: '/design/:designId/edit',
+          name: 'edit-design',
+          component: () => import('@/views/EditDesignView.vue')
+        },
+        {
+          path: '/design/add',
+          name: 'add-design',
+          component: () => import('@/views/AddDesignView.vue')
+        }
+      ]
     }
   ]
 });
