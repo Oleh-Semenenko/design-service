@@ -57,6 +57,8 @@ const initialDesigns: Design[] = [
 ];
 
 const designs: Ref<Design[]> = ref([...initialDesigns]);
+const currentDesign: Ref<Design | undefined> = ref();
+
 const isDesignsLoading = ref(false);
 const error = ref<string | null>(null);
 
@@ -66,7 +68,6 @@ export const useDesigns = () => {
     error.value = null;
     try {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      designs.value = [...initialDesigns];
       console.log('Designs loaded successfully', designs.value);
     } catch (err) {
       console.error('Error loading designs:', err);
@@ -75,5 +76,40 @@ export const useDesigns = () => {
       isDesignsLoading.value = false;
     }
   };
-  return { designs, getDesigns };
+  const getOneDesignById = async (designId: number) => {
+    isDesignsLoading.value = true;
+    error.value = null;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      currentDesign.value =
+        designs.value.filter((design) => design.id === designId)[0] || null;
+    } catch (err) {
+      console.error('Error loading design by id:', err);
+      throw new Error('Failed to load design by id');
+    } finally {
+      isDesignsLoading.value = false;
+    }
+  };
+  const deleteOneDesignById = async (designId: number) => {
+    isDesignsLoading.value = true;
+    error.value = null;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      designs.value =
+        designs.value.filter((design) => design.id !== designId) || [];
+    } catch (err) {
+      console.error('Error loading design by id:', err);
+      throw new Error('Failed to load design by id');
+    } finally {
+      isDesignsLoading.value = false;
+    }
+  };
+  return {
+    designs,
+    currentDesign,
+    isDesignsLoading,
+    getDesigns,
+    getOneDesignById,
+    deleteOneDesignById
+  };
 };

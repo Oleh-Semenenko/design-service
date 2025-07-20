@@ -1,7 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import DesignForm from '@/components/DesignForm.vue';
+</script>
 
 <template>
-  <div>Add design page</div>
+  <DesignForm />
 </template>
 
 <style lang="scss" scoped></style>

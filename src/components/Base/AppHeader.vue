@@ -1,16 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter, RouterLink } from 'vue-router';
+import { useDesigns } from '@/composables/useDesigns';
 import MainButton from '@/components/Base/MainButton.vue';
 import GoBackIcon from '@/components/icons/GoBackIcon.vue';
 import ToggleSwitch from '@/components/Base/ToggleSwitch.vue';
 
 const route = useRoute();
+const router = useRouter();
+const { deleteOneDesignById, isDesignsLoading } = useDesigns();
 
 const isHomePage = computed(() => route.name === 'home');
 const isEditDesignPage = computed(() => route.name === 'edit-design');
 
 const isDesignPublished = ref(false);
+
+const deleteOneDesign = async () => {
+  if (route.params.designId) {
+    await deleteOneDesignById(Number(route.params.designId));
+    router.push({ name: 'home' });
+  }
+};
 </script>
 
 <template>
@@ -21,7 +31,9 @@ const isDesignPublished = ref(false);
     </template>
 
     <template v-else>
-      <GoBackIcon />
+      <RouterLink to="/" aria-label="Повернутись на головну">
+        <GoBackIcon />
+      </RouterLink>
       <div class="header__switch">
         <ToggleSwitch v-model="isDesignPublished" />
         <span :class="{ published: isDesignPublished }">{{
@@ -29,8 +41,14 @@ const isDesignPublished = ref(false);
         }}</span>
       </div>
       <div class="header__actions">
-        <MainButton v-if="isEditDesignPage" text="Видалити" type="secondary" />
-        <MainButton text="Зберегти і вийти" />
+        <MainButton
+          v-if="isEditDesignPage"
+          text="Видалити"
+          type="secondary"
+          :disabled="isDesignsLoading"
+          :btn-callback="deleteOneDesign"
+        />
+        <MainButton text="Зберегти і вийти" :disabled="isDesignsLoading" />
       </div>
     </template>
   </header>

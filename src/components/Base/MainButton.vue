@@ -8,7 +8,6 @@ withDefaults(
   }>(),
   {
     type: 'primary',
-    text: 'Click Me',
     disabled: false,
     btnCallback: () => {}
   }
@@ -42,5 +41,9 @@ withDefaults(
     background-color: $white-color;
     color: $error-color;
   }
+}
+.main-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
