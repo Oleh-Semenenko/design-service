@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue';
+import { ref, computed, watch, onUnmounted, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import BaseInput from '@/components/Base/BaseInput.vue';
-import { type Design } from '@/composables/useDesigns';
+import { type Design, useDesigns } from '@/composables/useDesigns';
+import { useDesignFormStore } from '@/stores/designFormStore';
+import DeleteIcon from '@/components/icons/DeleteIcon.vue';
+import PlusIcon from '@/components/icons/PlusIcon.vue';
 
 interface ImagePreview {
   id: string;
@@ -11,12 +15,12 @@ interface ImagePreview {
 }
 
 const props = defineProps<{
-  initialData?: Design;
+  initialData?: Design | null;
 }>();
 
-const emit = defineEmits<{
-  (e: 'submit', payload: FormData): void;
-}>();
+const { addDesign, updateDesign } = useDesigns();
+const router = useRouter();
+const { setFormSubmitHandler } = useDesignFormStore();
 
 const isEditMode = computed(() => !!props.initialData);
 const fileInputRef = ref<HTMLInputElement | null>(null);
@@ -29,20 +33,35 @@ const formData = ref({
 
 const imagePreviews = ref<ImagePreview[]>([]);
 
+const initializeFormData = (data?: Design) => {
+  if (data) {
+    formData.value.name = data.title;
+    formData.value.number = String(data.number);
+    formData.value.designLink = data.link || '';
+    imagePreviews.value = data.photos.map((url) => ({
+      id: url,
+      url: url,
+      isNew: false
+    }));
+  } else {
+    formData.value = {
+      name: '',
+      number: '',
+      designLink: ''
+    };
+
+    imagePreviews.value.forEach((image) => {
+      if (image.isNew) {
+        URL.revokeObjectURL(image.url);
+      }
+    });
+    imagePreviews.value = [];
+  }
+};
 watch(
   () => props.initialData,
-  (data) => {
-    if (data) {
-      // Режим редагування: заповнюємо форму даними
-      formData.value.name = data.title;
-      formData.value.number = String(data.number);
-      formData.value.designLink = data.link || '';
-      imagePreviews.value = data.photos.map((url) => ({
-        id: url, // Використовуємо URL як унікальний ключ для існуючих зображень
-        url: url,
-        isNew: false
-      }));
-    }
+  (newData) => {
+    initializeFormData(newData as Design);
   },
   { immediate: true }
 );
@@ -81,7 +100,6 @@ const handleDrop = (event: DragEvent) => {
 const removeImage = (indexToRemove: number) => {
   const imageToRemove = imagePreviews.value[indexToRemove];
 
-  // Якщо це був об'єктний URL, звільняємо пам'ять
   if (imageToRemove.isNew) {
     URL.revokeObjectURL(imageToRemove.url);
   }
@@ -89,7 +107,7 @@ const removeImage = (indexToRemove: number) => {
   imagePreviews.value.splice(indexToRemove, 1);
 };
 
-const submitForm = () => {
+const submitForm = async () => {
   const payload = new FormData();
 
   payload.append('name', formData.value.name);
@@ -99,20 +117,56 @@ const submitForm = () => {
     payload.append('id', props.initialData.id.toString());
   }
 
-  // Додаємо тільки нові файли
+  // Add only new images
   const newFiles = imagePreviews.value.filter((p) => p.isNew && p.file);
+  const filesToUpload: File[] = [];
   newFiles.forEach((img) => {
-    payload.append('images[]', img.file!);
+    if (img.file) {
+      filesToUpload.push(img.file);
+    }
   });
 
-  // Ідентифікатори зображень, які залишилися (для режиму редагування)
   const existingImageUrls = imagePreviews.value
     .filter((p) => !p.isNew)
     .map((p) => p.url);
   payload.append('existingImageUrls', JSON.stringify(existingImageUrls));
 
-  emit('submit', payload);
+  try {
+    let resultDesign: Design;
+    if (isEditMode.value && props.initialData) {
+      // Edit design
+      resultDesign = await updateDesign(
+        props.initialData.id,
+        {
+          title: formData.value.name,
+          number: Number(formData.value.number),
+          link: formData.value.designLink
+        },
+        filesToUpload,
+        existingImageUrls
+      );
+    } else {
+      // Add new design
+      resultDesign = await addDesign(
+        {
+          title: formData.value.name,
+          number: Number(formData.value.number),
+          link: formData.value.designLink
+        },
+        filesToUpload
+      );
+      console.log('Successful addition of new design', resultDesign);
+    }
+
+    router.push('/');
+  } catch (err) {
+    console.error('DesignForm: Error during submission:', err);
+  }
 };
+
+onMounted(() => {
+  setFormSubmitHandler(submitForm);
+});
 
 onUnmounted(() => {
   imagePreviews.value.forEach((image) => {
@@ -120,15 +174,19 @@ onUnmounted(() => {
       URL.revokeObjectURL(image.url);
     }
   });
+  setFormSubmitHandler(null);
 });
 </script>
 
 <template>
   <form class="design-form" @submit.prevent="submitForm">
     <div class="form-section">
-      <label for="imageInput" class="visually-hidden">Зображення дизайну</label>
+      <label for="imageInput" class="visually-hidden-label"
+        >Зображення дизайну</label
+      >
       <div
         class="image-uploader"
+        :class="{ 'has-images': imagePreviews.length > 0 }"
         @click="triggerFileInput"
         @dragover.prevent
         @dragleave.prevent
@@ -159,10 +217,12 @@ onUnmounted(() => {
               class="delete-button"
               @click.stop="removeImage(index)"
             >
-              &#x1F5D1;
+              <DeleteIcon />
             </button>
           </div>
-          <div class="add-more-button" @click.stop="triggerFileInput">+</div>
+          <div class="add-more-button" @click.stop="triggerFileInput">
+            <PlusIcon />
+          </div>
         </div>
       </div>
       <input
@@ -181,6 +241,7 @@ onUnmounted(() => {
         <BaseInput
           v-model="formData.number"
           id="designNumber"
+          type="number"
           label="Номер дизайну"
           placeholder="###"
           class="input-number"
@@ -209,17 +270,20 @@ onUnmounted(() => {
 .design-form {
   max-width: 600px;
   margin-left: 88px;
+
+  @include mobile {
+    margin-left: 40px;
+  }
 }
 
-.form-section {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
+.form-section:not(:last-child) {
+  margin-bottom: 40px;
+  @include tablet {
+    margin-bottom: 24px;
+  }
+  @include mobile {
+    margin-bottom: 16px;
+  }
 }
 
 .image-uploader {
@@ -236,10 +300,15 @@ onUnmounted(() => {
   transition:
     border-color 0.3s,
     background-color 0.3s;
+
+  &.has-images {
+    border: none;
+    padding: 0;
+  }
 }
 
-.image-uploader:hover {
-  border-color: #007bff;
+.image-uploader:not(.has-images):hover {
+  border-color: $blue-accent-color;
   background-color: #f0f8ff;
 }
 
@@ -248,24 +317,19 @@ onUnmounted(() => {
   margin-bottom: 1rem;
 }
 
-.uploader-placeholder p {
-  color: #666;
-  margin: 0;
-}
-
 .image-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 1rem;
+  gap: 8px;
   width: 100%;
-  padding: 1rem;
 }
 
 .preview-item {
   position: relative;
-  border-radius: 8px;
+  border-radius: 3px;
   overflow: hidden;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: $main-border-styles;
 }
 
 .preview-image {
@@ -277,16 +341,14 @@ onUnmounted(() => {
 
 .delete-button {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
+  bottom: 4px;
+  right: 4px;
+  padding: 4px;
+  background: #00000080;
   border: none;
-  border-radius: 50%;
+  border-radius: 3px;
   width: 24px;
   height: 24px;
-  font-size: 14px;
-  line-height: 24px;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -305,11 +367,11 @@ onUnmounted(() => {
   align-items: center;
   border: 2px dashed #ccc;
   border-radius: 8px;
-  font-size: 2rem;
-  color: #aaa;
+  font-size: 30px;
+  color: #c4c4c4;
   cursor: pointer;
   transition: all 0.3s;
-  min-height: 120px;
+  aspect-ratio: 1 / 1;
 }
 
 .add-more-button:hover {
@@ -320,6 +382,10 @@ onUnmounted(() => {
 .input-group {
   display: flex;
   gap: 8px;
+  @include mobile {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
 
 .input-number {
@@ -327,6 +393,9 @@ onUnmounted(() => {
   flex-grow: 0;
   flex-shrink: 0;
   text-align: center;
+  @include mobile {
+    flex-basis: 100%;
+  }
 }
 
 .input-main:focus,

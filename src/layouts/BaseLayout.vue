@@ -15,8 +15,12 @@ import { RouterView } from 'vue-router';
       }"
     >
       <AppHeader />
-      <main>
-        <RouterView />
+      <main class="main-content">
+        <RouterView v-slot="{ Component }">
+          <Transition name="fade" mode="out-in">
+            <component :is="Component"></component>
+          </Transition>
+        </RouterView>
       </main>
     </div>
   </div>
@@ -32,5 +36,18 @@ import { RouterView } from 'vue-router';
 }
 .design-view {
   background-color: $white-color;
+}
+.main-content {
+  padding-bottom: 20px;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -5,10 +5,12 @@ import { useDesigns } from '@/composables/useDesigns';
 import MainButton from '@/components/Base/MainButton.vue';
 import GoBackIcon from '@/components/icons/GoBackIcon.vue';
 import ToggleSwitch from '@/components/Base/ToggleSwitch.vue';
+import { useDesignFormStore } from '@/stores/designFormStore';
 
 const route = useRoute();
 const router = useRouter();
 const { deleteOneDesignById, isDesignsLoading } = useDesigns();
+const { currentFormSubmitHandler } = useDesignFormStore();
 
 const isHomePage = computed(() => route.name === 'home');
 const isEditDesignPage = computed(() => route.name === 'edit-design');
@@ -27,11 +29,18 @@ const deleteOneDesign = async () => {
   <header class="header">
     <template v-if="isHomePage">
       <h1 class="home-header__title">Всі дизайни</h1>
-      <MainButton text="Додати дизайн" />
+      <MainButton
+        text="Додати дизайн"
+        :btn-callback="() => router.push({ name: 'add-design' })"
+      />
     </template>
 
     <template v-else>
-      <RouterLink to="/" aria-label="Повернутись на головну">
+      <RouterLink
+        to="/"
+        aria-label="Повернутись на головну"
+        class="header__back-link"
+      >
         <GoBackIcon />
       </RouterLink>
       <div class="header__switch">
@@ -48,7 +57,11 @@ const deleteOneDesign = async () => {
           :disabled="isDesignsLoading"
           :btn-callback="deleteOneDesign"
         />
-        <MainButton text="Зберегти і вийти" :disabled="isDesignsLoading" />
+        <MainButton
+          text="Зберегти і вийти"
+          :disabled="isDesignsLoading"
+          @click="currentFormSubmitHandler"
+        />
       </div>
     </template>
   </header>
@@ -61,11 +74,21 @@ const deleteOneDesign = async () => {
   align-items: center;
   padding: 20px 0;
   gap: 64px;
+
+  @include mobile {
+    gap: 16px;
+  }
 }
 .home-header__title {
   font-size: 24px;
   line-height: 1.67;
   color: $white-color;
+}
+
+.header__back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header__switch {
@@ -76,6 +99,10 @@ const deleteOneDesign = async () => {
 
   & span.published {
     color: $toggler-color;
+  }
+
+  @include mobile {
+    gap: 6px;
   }
 }
 .header__actions {

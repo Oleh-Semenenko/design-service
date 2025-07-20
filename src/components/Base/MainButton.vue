@@ -28,7 +28,7 @@ withDefaults(
 
 <style lang="scss" scoped>
 .main-button {
-  background-color: $btn-primary-color;
+  background-color: $blue-accent-color;
   color: $white-color;
   border: $main-border-styles;
   padding: 6px 10px;
@@ -36,6 +36,7 @@ withDefaults(
   cursor: pointer;
   font-size: 14px;
   line-height: 1.43;
+  text-wrap: nowrap;
 
   &--secondary {
     background-color: $white-color;

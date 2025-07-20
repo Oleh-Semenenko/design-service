@@ -25,6 +25,11 @@ const handleChange = (event: Event) => {
   width: 64px;
   height: 24px;
   cursor: pointer;
+
+  @include mobile {
+    width: 48px;
+    height: 20px;
+  }
 }
 
 .toggle-switch input {
@@ -55,6 +60,13 @@ const handleChange = (event: Event) => {
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   transition: transform 0.4s;
+
+  @include mobile {
+    height: 18px;
+    width: 18px;
+    left: 1px;
+    bottom: 1px;
+  }
 }
 
 input:checked + .slider {
@@ -63,5 +75,9 @@ input:checked + .slider {
 
 input:checked + .slider::before {
   transform: translateX(40px);
+
+  @include mobile {
+    transform: translateX(28px);
+  }
 }
 </style>

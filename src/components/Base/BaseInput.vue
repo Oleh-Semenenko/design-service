@@ -50,14 +50,13 @@ withDefaults(
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333;
 }
 
 .input {
   width: 100%;
   padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: $main-border-styles;
+  border-radius: 3px;
   font-size: 1rem;
   transition:
     border-color 0.3s,
@@ -66,28 +65,9 @@ withDefaults(
 
 .input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.input:disabled {
-  background-color: #f0f0f0;
-  color: #666;
-  cursor: not-allowed;
+  border-color: $blue-accent-color;
 }
 .input::placeholder {
   color: $gray-light-20-opacity;
-}
-
-.visually-hidden-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
 }
 </style>

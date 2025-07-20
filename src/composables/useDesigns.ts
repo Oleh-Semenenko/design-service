@@ -57,10 +57,12 @@ const initialDesigns: Design[] = [
 ];
 
 const designs: Ref<Design[]> = ref([...initialDesigns]);
-const currentDesign: Ref<Design | undefined> = ref();
+const currentDesign: Ref<Design | null | undefined> = ref(null);
 
 const isDesignsLoading = ref(false);
 const error = ref<string | null>(null);
+
+let nextDesignId = initialDesigns.length + 1;
 
 export const useDesigns = () => {
   const getDesigns = async () => {
@@ -77,6 +79,8 @@ export const useDesigns = () => {
     }
   };
   const getOneDesignById = async (designId: number) => {
+    currentDesign.value = null;
+
     isDesignsLoading.value = true;
     error.value = null;
     try {
@@ -104,12 +108,86 @@ export const useDesigns = () => {
       isDesignsLoading.value = false;
     }
   };
+  const updateDesign = async (
+    designId: number,
+    updatedDesignData: Partial<Omit<Design, 'photos'>>,
+    newPhotos: File[],
+    existingPhotoUrls: string[]
+  ): Promise<Design> => {
+    isDesignsLoading.value = true;
+    error.value = null;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 700)); // Simulate API delay
+
+      const index = designs.value.findIndex((d) => d.id === designId);
+      if (index === -1) {
+        throw new Error(`There is no design with id ${designId}`);
+      }
+      const currentDesignData = designs.value[index];
+
+      // Simulate new photo uploads
+      const newlyUploadedPhotoUrls: string[] = newPhotos.map((file) =>
+        URL.createObjectURL(file)
+      );
+      const combinedPhotos = [...existingPhotoUrls, ...newlyUploadedPhotoUrls];
+
+      const updatedDesign: Design = {
+        ...currentDesignData,
+        ...updatedDesignData,
+        id: designId,
+        photos: combinedPhotos
+      };
+
+      designs.value.splice(index, 1, updatedDesign);
+      console.log('Design updated:', updatedDesign);
+      return updatedDesign;
+    } catch (err) {
+      console.error('Error adding design:', err);
+      error.value = 'Failed to update design';
+      throw new Error('Failed to update design');
+    } finally {
+      isDesignsLoading.value = false;
+    }
+  };
+  const addDesign = async (
+    newDesignData: Omit<Design, 'id' | 'photos'>,
+    newPhotos: File[]
+  ): Promise<Design> => {
+    isDesignsLoading.value = true;
+    error.value = null;
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 700)); // Simulate API delay
+
+      const photoUrls: string[] = newPhotos.map((file) =>
+        URL.createObjectURL(file)
+      );
+
+      const newDesign: Design = {
+        id: nextDesignId++,
+        title: newDesignData.title,
+        link: newDesignData.link,
+        number: newDesignData.number,
+        photos: photoUrls
+      };
+
+      designs.value.push(newDesign);
+      return newDesign;
+    } catch (err) {
+      console.error('Error adding design:', err);
+      error.value = 'Failed to add design';
+      throw new Error('Failed to add design');
+    } finally {
+      isDesignsLoading.value = false;
+    }
+  };
   return {
     designs,
     currentDesign,
     isDesignsLoading,
     getDesigns,
     getOneDesignById,
-    deleteOneDesignById
+    deleteOneDesignById,
+    updateDesign,
+    addDesign
   };
 };
