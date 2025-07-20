@@ -1,0 +1,10 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="none">
+    <path
+      fill="#C4C4C4"
+      fill-rule="evenodd"
+      d="M15 0a1 1 0 0 0-1 1v13H1a1 1 0 1 0 0 2h13v13a1 1 0 1 0 2 0V16h13a1 1 0 1 0 0-2H16V1a1 1 0 0 0-1-1Z"
+      clip-rule="evenodd"
+    />
+  </svg>
+</template>
