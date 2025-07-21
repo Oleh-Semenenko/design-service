@@ -61,6 +61,10 @@ withDefaults(
   transition:
     border-color 0.3s,
     box-shadow 0.3s;
+
+  @include mobile-small {
+    font-size: 14px;
+  }
 }
 
 .input:focus {

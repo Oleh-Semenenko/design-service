@@ -40,7 +40,7 @@ const onImageLoad = () => {
     </div>
     <div class="design-card__info">
       <span class="design-card__info-number">{{ design.number }}</span>
-      <h2 class="design-card__info-title">{{ design.title }}</h2>
+      <h2 class="design-card__info-title long-ellipsis">{{ design.title }}</h2>
     </div>
   </div>
 </template>
@@ -52,6 +52,11 @@ const onImageLoad = () => {
   gap: 16px;
   width: 100%;
   cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 .design-card__image-wrapper {
   display: flex;

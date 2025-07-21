@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router';
   <div class="base-layout">
     <SideBar />
     <div
-      class="container home-view"
+      class="container"
       :class="{
         'home-view': $route.name === 'home',
         'design-view': $route.name !== 'home'

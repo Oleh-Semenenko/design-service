@@ -132,10 +132,9 @@ const submitForm = async () => {
   payload.append('existingImageUrls', JSON.stringify(existingImageUrls));
 
   try {
-    let resultDesign: Design;
     if (isEditMode.value && props.initialData) {
       // Edit design
-      resultDesign = await updateDesign(
+      await updateDesign(
         props.initialData.id,
         {
           title: formData.value.name,
@@ -147,7 +146,7 @@ const submitForm = async () => {
       );
     } else {
       // Add new design
-      resultDesign = await addDesign(
+      await addDesign(
         {
           title: formData.value.name,
           number: Number(formData.value.number),
@@ -155,7 +154,6 @@ const submitForm = async () => {
         },
         filesToUpload
       );
-      console.log('Successful addition of new design', resultDesign);
     }
 
     router.push('/');

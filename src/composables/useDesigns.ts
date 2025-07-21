@@ -139,7 +139,6 @@ export const useDesigns = () => {
       };
 
       designs.value.splice(index, 1, updatedDesign);
-      console.log('Design updated:', updatedDesign);
       return updatedDesign;
     } catch (err) {
       console.error('Error adding design:', err);
@@ -180,6 +179,9 @@ export const useDesigns = () => {
       isDesignsLoading.value = false;
     }
   };
+  const resetCurrentDesign = () => {
+    currentDesign.value = null;
+  };
   return {
     designs,
     currentDesign,
@@ -188,6 +190,7 @@ export const useDesigns = () => {
     getOneDesignById,
     deleteOneDesignById,
     updateDesign,
-    addDesign
+    addDesign,
+    resetCurrentDesign
   };
 };
