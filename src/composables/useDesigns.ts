@@ -99,7 +99,7 @@ export const useDesigns = () => {
     isDesignsLoading.value = true;
     error.value = null;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       designs.value =
         designs.value.filter((design) => design.id !== designId) || [];
     } catch (err) {
