@@ -38,7 +38,7 @@ import { RouterView } from 'vue-router';
   background-color: $white-color;
 }
 .main-content {
-  padding-bottom: 20px;
+  padding-bottom: 40px;
 }
 
 .fade-enter-active,

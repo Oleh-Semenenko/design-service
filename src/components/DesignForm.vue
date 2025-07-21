@@ -178,7 +178,7 @@ onUnmounted(() => {
 
 <template>
   <form class="design-form" @submit.prevent="submitForm">
-    <div class="form-section">
+    <div class="form-section first">
       <label for="imageInput" class="visually-hidden-label"
         >Зображення дизайну</label
       >
@@ -234,7 +234,7 @@ onUnmounted(() => {
       />
     </div>
 
-    <div class="form-section">
+    <div class="form-section second">
       <div class="input-group">
         <BaseInput
           v-model="formData.number"
@@ -253,7 +253,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="form-section">
+    <div class="form-section third">
       <BaseInput
         v-model="formData.designLink"
         id="designUrl"
@@ -274,11 +274,17 @@ onUnmounted(() => {
   }
 }
 
-.form-section:not(:last-child) {
+.form-section.first {
   margin-bottom: 40px;
   @include tablet {
     margin-bottom: 24px;
   }
+  @include mobile {
+    margin-bottom: 16px;
+  }
+}
+.form-section.second {
+  margin-bottom: 24px;
   @include mobile {
     margin-bottom: 16px;
   }
