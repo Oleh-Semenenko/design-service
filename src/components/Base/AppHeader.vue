@@ -49,10 +49,10 @@ watch(
   <header class="header" :class="{ 'is-home-page': isHomePage }">
     <template v-if="isHomePage">
       <h1 class="home-header__title">Всі дизайни</h1>
-      <MainButton
-        text="Додати дизайн"
-        :btn-callback="() => router.push({ name: 'add-design' })"
-      />
+
+      <nav>
+        <MainButton text="Додати дизайн" link="/design/add" />
+      </nav>
     </template>
 
     <template v-else>

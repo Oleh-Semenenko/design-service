@@ -64,6 +64,7 @@ const error = ref<string | null>(null);
 
 let nextDesignId = initialDesigns.length + 1;
 
+// Here we are simulating the CRUD by the api. That is why you can see Promises in the functions
 export const useDesigns = () => {
   const getDesigns = async () => {
     isDesignsLoading.value = true;
@@ -117,7 +118,7 @@ export const useDesigns = () => {
     isDesignsLoading.value = true;
     error.value = null;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 700)); // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API delay
 
       const index = designs.value.findIndex((d) => d.id === designId);
       if (index === -1) {
@@ -155,7 +156,7 @@ export const useDesigns = () => {
     isDesignsLoading.value = true;
     error.value = null;
     try {
-      await new Promise((resolve) => setTimeout(resolve, 700)); // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API delay
 
       const photoUrls: string[] = newPhotos.map((file) =>
         URL.createObjectURL(file)

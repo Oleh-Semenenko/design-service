@@ -4,6 +4,7 @@ withDefaults(
     type?: 'primary' | 'secondary';
     text: string;
     disabled?: boolean;
+    link?: string;
     btnCallback?: () => void;
   }>(),
   {
@@ -15,7 +16,18 @@ withDefaults(
 </script>
 
 <template>
+  <RouterLink
+    v-if="link"
+    :to="link"
+    class="main-button"
+    :class="`main-button--${type}`"
+    :disabled="disabled"
+  >
+    {{ text }}
+  </RouterLink>
+
   <button
+    v-else
     class="main-button"
     :class="`main-button--${type}`"
     @click="btnCallback"
