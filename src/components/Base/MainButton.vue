@@ -42,6 +42,11 @@ withDefaults(
     background-color: $white-color;
     color: $error-color;
   }
+
+  @include mobile-small {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
 }
 .main-button:disabled {
   opacity: 0.6;

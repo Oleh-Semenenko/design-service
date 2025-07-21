@@ -2,8 +2,9 @@
 import { onMounted } from 'vue';
 import DesignsList from '@/components/DesignsList.vue';
 import { useDesigns } from '@/composables/useDesigns';
+import AppLoader from '@/components/Base/AppLoader.vue';
 
-const { getDesigns, designs } = useDesigns();
+const { getDesigns, designs, isDesignsLoading } = useDesigns();
 
 onMounted(async () => {
   await getDesigns();
@@ -11,7 +12,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DesignsList :designs="designs" />
+  <DesignsList v-if="!isDesignsLoading" :designs="designs" />
+  <AppLoader v-else />
 </template>
 
 <style lang="scss" scoped></style>
